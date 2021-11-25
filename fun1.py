@@ -4,6 +4,8 @@ import librosa.display
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import soundfile as sf
+import cmath
 
 def readAudioFile(absPath):
     audioData, samplingRate = librosa.load(absPath,sr=None)
@@ -68,3 +70,22 @@ def mapImgToSTFT(startX, startY, monoImg, stft, durationX = 0, durationY = 0, am
 def stftToWavFile(stft, fileName, frame_size, hop_size ,samplingRate = 44100):
     audioData = librosa.istft(stft, hop_size, frame_size)
     sf.write(fileName, audioData, samplingRate, 'PCM_24')
+    
+def mergeCompNum(modulArr, phaseArr):
+    xShape = modulArr.shape[1]
+    yShape = modulArr.shape[0]
+    complexArr = np.zeros_like(phaseArr,dtype=np.complex64)
+    for x in range(xShape):
+            for y in range(yShape):
+                complexArr[y][x] = cmath.rect(modulArr[y][x], phaseArr[y][x])
+    return complexArr
+
+def splitCompNum(complexNumberArr):
+    xShape = complexNumberArr.shape[1]
+    yShape = complexNumberArr.shape[0]
+    modulArr = np.zeros_like(complexNumberArr,dtype=np.float32)
+    phaseArr = np.zeros_like(complexNumberArr,dtype=np.float32)
+    for x in range(xShape):
+            for y in range(yShape):
+                modulArr[y][x],phaseArr[y][x] = cmath.polar(complexNumberArr[y][x])
+    return modulArr, phaseArr
