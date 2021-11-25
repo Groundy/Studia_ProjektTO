@@ -2,7 +2,7 @@ import sys
 import numpy as np
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QMessageBox
-import funcs
+import fun1, fun2
 import librosa 
 from PyQt5.QtGui import QImage,QPixmap
 import cv2
@@ -67,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if( len(selectedFiles) == 1):
             label = self.findChild(QLabel, "audioFileNameLabel")
             label.setText(selectedFiles[0])      
-            audioDataTmp, durationTMP, samplingRate = funcs.readAudioFile(selectedFiles[0])
+            audioDataTmp, durationTMP, samplingRate = fun1.readAudioFile(selectedFiles[0])
             self.fileDurationMs = durationTMP
             self.audioData = audioDataTmp
             self.fillAudioLabels(self.fileDurationMs, samplingRate)
@@ -79,7 +79,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         selectedFiles = fileDialog.selectedFiles()
         if( len(selectedFiles) == 1):
             absPathToFile = selectedFiles[0]
-            self.imgData ,width , height, minLum, maxLum = funcs.readImg(absPathToFile)
+            self.imgData ,width , height, minLum, maxLum = fun1.readImg(absPathToFile)
             self.fillImageLabels(absPathToFile, width , height, minLum, maxLum)
     
     def startTimeChanged(self):
@@ -155,7 +155,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if(turnOnGui):
             self.turnOnGui()
         
-        funcs.paintSpectogram(STFT_TMP,self.SAMPLING_RATE, self.HOP_SIZE)
+        fun1.paintSpectogram(STFT_TMP,self.SAMPLING_RATE, self.HOP_SIZE)
         self.paintSpectogramToLabel()
         
     def calculateRecomendedValues():
