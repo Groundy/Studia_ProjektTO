@@ -138,8 +138,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         
     def calculateSTFT(self):
-        if(len(self.audioData) == 0 ):
-            #wyswietlic jakis blad
+        if(len(self.audioData) == 0):
+            printError("some error")
             return
         STFT_TMP = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE)
         STFT_TMP = abs(STFT_TMP)
