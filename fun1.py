@@ -64,3 +64,7 @@ def mapImgToSTFT(startX, startY, monoImg, stft, durationX = 0, durationY = 0, am
                 valToSet*= 10**(amplifierDb/10)
             stft[yPosSpect][xPosSpect] = valToSet
     return stft
+
+def stftToWavFile(stft, fileName, frame_size, hop_size ,samplingRate = 44100):
+    audioData = librosa.istft(stft, hop_size, frame_size)
+    sf.write(fileName, audioData, samplingRate, 'PCM_24')
