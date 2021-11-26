@@ -199,7 +199,7 @@
            <bool>false</bool>
           </property>
           <property name="maximum">
-           <number>999</number>
+           <number>999999999</number>
           </property>
          </widget>
         </item>
@@ -265,7 +265,7 @@
         <item row="4" column="2">
          <widget class="QLabel" name="calculatedFramesToUse_T">
           <property name="text">
-           <string> = 0 klatek czasowych</string>
+           <string>= 0 klatek czasowych</string>
           </property>
          </widget>
         </item>
@@ -273,6 +273,9 @@
          <widget class="QSpinBox" name="imgDurationSpinBox_F">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
           </property>
          </widget>
         </item>
