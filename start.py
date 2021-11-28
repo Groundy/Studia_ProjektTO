@@ -134,8 +134,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if(isChecked):
             spinBox1.setEnabled(True)
             spinBox2.setEnabled(True)            
-            spinBox1.setValue(0)
-            spinBox2.setValue(0)
+            spinBox1.setValue(1)
+            spinBox2.setValue(1)
         else:
             spinBox1.setEnabled(False)
             spinBox2.setEnabled(False)    
@@ -144,6 +144,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.durationTimeChanged()
         self.frequencyDurationChanged()
         
+    def printScaleRatioToGui(self):
+        a = np.float(self.durationFrameFreq)
+        b = np.float(self.durationFrameTime)
+        label = self.findChild(QLabel,"WToHRatioLabel_mod")
+        if( a > 0 and b > 0 ):
+            dimRatio =  a/b
+            dimRatioStr = str(round(dimRatio, 2))
+            label.setText("Przeskalowany stosunek W/H : "+ dimRatioStr)
+        else:
+            label.setText("Złe parametry skalowania")
         
     def startFrequencyChanged(self):
         spinBox = self.findChild(QSpinBox,"startImgSpinBox_F")
@@ -162,6 +172,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         label = self.findChild(QLabel,"calculatedTimeToUse")
         label.setText("= " + str(durationTimeInMsc) + " ms")
         self.setProperColorOfGuiTexts("time")
+        self.printScaleRatioToGui()
         
     def frequencyDurationChanged(self):
         spinBox = self.findChild(QSpinBox,"imgDurationSpinBox_F")
@@ -171,6 +182,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         label = self.findChild(QLabel,"calculatedFreqToUse")
         label.setText("= " + str(durationFreqInHz) + " Hz")
         self.setProperColorOfGuiTexts("freq")
+        self.printScaleRatioToGui()
         
     def paintSpectogramToLabel(self, spectrogram):
         labelToPaint = self.findChild(QLabel,"spectogramLabel")
@@ -201,10 +213,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             return
         stft = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE)
         self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stft)
+        
         timeFramesLabel = self.findChild(QLabel,"totalTimeFramesLabel")
         freqFramesLabel = self.findChild(QLabel,"totalFreqFramesLabel")
         timeFramesLabel.setText("klatek częst. = " + str(self.stftModulOrg.shape[0]))
         freqFramesLabel.setText("klatek czasowych = " + str(self.stftModulOrg.shape[1]))
+        widthHightRatioLabelOrg = self.findChild(QLabel,"WToHRatioLabel_org")
+        dimRatio = np.float(self.imgData.shape[0]) / np.float(self.imgData.shape[1])
+        dimRatioStr = str(round(dimRatio, 2))
+        widthHightRatioLabelOrg.setText("Oryginalny stosunek W/H : "+dimRatioStr)
+        
         maxFreq = (1 + self.FRAME_SIZE / 2) * self.samplingRate / self.FRAME_SIZE
         self.hzPerFreqFrame = maxFreq / stft.shape[0]
         self.miliSecsForTimeFrame = self.fileDurationMs / stft.shape[1]
