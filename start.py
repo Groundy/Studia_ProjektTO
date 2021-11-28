@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QMessageBox, QCheckBox, QPushButton
 import fun1, fun2
 import librosa 
 from PyQt5.QtGui import QImage,QPixmap, QPalette, QColor
@@ -12,16 +12,19 @@ Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     audioData = None
     samplingRate = 0
+    fileDurationMs = 0
     imgData = None
     FRAME_SIZE = int(1024)
     HOP_SIZE = int(FRAME_SIZE / 4)
-    stftMod = None
-    stftPhase = None
-    fileDurationMs = 0
+    stftModulOrg = None
+    stftPhaseOrg = None
+    stftModulModified = None
     startFrameTime = 0
     startFrameFreq = 0
     durationFrameTime = 0
     durationFrameFreq = 0
+    miliSecsForTimeFrame = 0
+    hzPerFreqFrame = 0
     
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
@@ -32,8 +35,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         messageBox = QMessageBox(text = textToDisplay)
         messageBox.exec_()
     
-    def fillAudioLabels(self, durationMsec,sampling):
-        samplingText = str("Próbkowanie: ") + str(sampling) + " Hz"
+    def fillAudioLabels(self):
+        durationMsec = self.fileDurationMs
+        
+        samplingText = str("Próbkowanie: ") + str(self.samplingRate) + " Hz"
         minutes = int(np.floor(durationMsec / 60000))
         durationMsec -= (minutes * 60000)
         sec = int(np.floor(durationMsec / 1000 ))
@@ -46,6 +51,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         samplingLabel = self.findChild(QLabel,"samplingLabel")
         samplingLabel.setText(samplingText)
 
+    def resetLabelToUnmodifiedSpectrogram(self):
+        figure = fun1.paintSpectogram(self.stftModulOrg, self.samplingRate, self.HOP_SIZE)
+        self.paintSpectogramToLabel(figure)
+        
+    def addImgToTmpSpectrogram(self):
+        self.stftModulModified = fun1.mapImgToSTFT(self.startFrameTime,
+                                                   self.startFrameFreq,
+                                                   self.imgData,
+                                                   self.stftModulOrg,
+                                                   self.durationFrameTime,
+                                                   self.durationFrameFreq)
+        figure = fun1.paintSpectogram(self.stftModulModified, self.samplingRate, self.HOP_SIZE)
+        self.paintSpectogramToLabel(figure)
+        
+    def saveResultsToFiles(self):
+        print("saveResultsToFiles")
+        
     def fillImageLabels(self, fileName, width , height, minLum, maxLum):
         widthLabel = self.findChild(QLabel,"heightLabel")
         heightLabel = self.findChild(QLabel,"widthLabel")
@@ -65,11 +87,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if( len(selectedFiles) == 1):
             label = self.findChild(QLabel, "audioFileNameLabel")
             label.setText(selectedFiles[0])      
-            audioDataTmp, durationTMP, samplingRate = fun1.readAudioFile(selectedFiles[0])
-            self.fileDurationMs = durationTMP
-            self.audioData = audioDataTmp
-            self.fillAudioLabels(self.fileDurationMs, samplingRate)
-            self.SAMPLING_RATE = samplingRate
+            self.audioData, self.fileDurationMs, self.samplingRate = fun1.readAudioFile(selectedFiles[0])
+            self.fillAudioLabels()
             
     def chooseImageFileButtonPressed(self):
         fileDialog = QFileDialog(self,filter = "*.png")
@@ -82,13 +101,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def setProperColorOfGuiTexts(self, axis):
         if(axis == "time"):
-            label1 = self.findChild(QLabel,"calculatedFrameToStart_T")
-            label2 = self.findChild(QLabel,"calculatedFramesToUse_T")
-            areValuesCorrect = self.durationFrameTime + self.startFrameTime < self.stftModul.shape[1]
+            label1 = self.findChild(QLabel,"calculatedTimeToStart")
+            label2 = self.findChild(QLabel,"calculatedTimeToUse")
+            areValuesCorrect = self.durationFrameTime + self.startFrameTime < self.stftModulOrg.shape[1]
         elif(axis == "freq"):
-            label1 = self.findChild(QLabel,"calculatedFrameToStart_F")
-            label2 = self.findChild(QLabel,"calculatedFramesToUse_F")
-            areValuesCorrect = self.durationFrameFreq + self.startFrameFreq < self.stftModul.shape[0]
+            label1 = self.findChild(QLabel,"calculatedFreqToStart")
+            label2 = self.findChild(QLabel,"calculatedFreqToUse")
+            areValuesCorrect = self.durationFrameFreq + self.startFrameFreq < self.stftModulOrg.shape[0]
         
         color = QColor(0x000000) if areValuesCorrect else QColor(0xff0000)
         palette1 = label1.palette()
@@ -100,52 +119,64 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def startTimeChanged(self):
         spinBox = self.findChild(QSpinBox,"startImgSpinBox_T")
-        valueInMs = int(spinBox.value()) * 100
-        MsPerFrame = self.fileDurationMs / self.stftModul.shape[1]
-        startFrame = int(np.floor(valueInMs / MsPerFrame))
-        self.startFrameTime = startFrame
+        startTimeInFrames = int(spinBox.value())
+        startTimeInMsc = int(startTimeInFrames * self.miliSecsForTimeFrame)
+        self.startFrameTime = startTimeInFrames
         
-        label1 = self.findChild(QLabel,"calculatedFrameToStart_T")
-        label1.setText(" = " + str(startFrame) + " klatka czasu")
+        label1 = self.findChild(QLabel,"calculatedTimeToStart")
+        label1.setText("= " + str(startTimeInMsc) + " ms")
         self.setProperColorOfGuiTexts("time")
+        
+    def allowScalingChechBoxChanged(self):
+        isChecked = self.findChild(QCheckBox,"scalingChekbox").isChecked()
+        spinBox1 = self.findChild(QSpinBox ,"imgDurationSpinBox_T")
+        spinBox2 = self.findChild(QSpinBox ,"imgDurationSpinBox_F")
+        if(isChecked):
+            spinBox1.setEnabled(True)
+            spinBox2.setEnabled(True)            
+            spinBox1.setValue(0)
+            spinBox2.setValue(0)
+        else:
+            spinBox1.setEnabled(False)
+            spinBox2.setEnabled(False)    
+            spinBox1.setValue(self.imgData.shape[1])
+            spinBox2.setValue(self.imgData.shape[0])
+        self.durationTimeChanged()
+        self.frequencyDurationChanged()
         
         
     def startFrequencyChanged(self):
         spinBox = self.findChild(QSpinBox,"startImgSpinBox_F")
-        startValueInHz = int(spinBox.value()) * 100
-        MAX_FREQ = 20000
-        hzPerFrame = MAX_FREQ / self.stftModul.shape[0]
-        startFrame = int(np.floor(startValueInHz / hzPerFrame))
-        self.startFrameFreq = startFrame
-        label = self.findChild(QLabel,"calculatedFrameToStart_F")
-        label.setText(" = " + str(startFrame) + " klatka częstotliwosci")
+        startFreqInFrames = int(spinBox.value())
+        startFreqInHz = int(startFreqInFrames * self.hzPerFreqFrame)
+        self.startFrameFreq = startFreqInFrames
+        label = self.findChild(QLabel,"calculatedFreqToStart")
+        label.setText("= " + str(startFreqInHz) + " Hz")
         self.setProperColorOfGuiTexts("freq")
         
     def durationTimeChanged(self):
         spinBox = self.findChild(QSpinBox,"imgDurationSpinBox_T")
-        valueInMs = int(spinBox.value()) * 100
-        MsPerFrame = self.fileDurationMs / self.stftModul.shape[1]
-        durationFrames = int(np.floor(valueInMs / MsPerFrame))
-        self.durationFrameTime = durationFrames
-        label = self.findChild(QLabel,"calculatedFramesToUse_T")
-        label.setText(" = " + str(durationFrames) + " klatek czasu")
+        durationTimeInFrames = int(spinBox.value())
+        durationTimeInMsc = int(durationTimeInFrames * self.miliSecsForTimeFrame)
+        self.durationFrameTime = durationTimeInFrames
+        label = self.findChild(QLabel,"calculatedTimeToUse")
+        label.setText("= " + str(durationTimeInMsc) + " ms")
         self.setProperColorOfGuiTexts("time")
         
     def frequencyDurationChanged(self):
         spinBox = self.findChild(QSpinBox,"imgDurationSpinBox_F")
-        startValueInHz = int(spinBox.value()) * 100
-        MAX_FREQ = 20000
-        hzPerFrame = MAX_FREQ / self.stftModul.shape[0]
-        durationFrames = int(np.floor(startValueInHz / hzPerFrame))
-        self.durationFrameFreq = durationFrames
-        label = self.findChild(QLabel,"calculatedFramesToUse_F")
-        label.setText(" = " + str(durationFrames) + " klatek częstotliwosci")
+        durationFreqInFrames = int(spinBox.value())
+        durationFreqInHz = int(durationFreqInFrames * self.hzPerFreqFrame)
+        self.durationFrameFreq = durationFreqInFrames
+        label = self.findChild(QLabel,"calculatedFreqToUse")
+        label.setText("= " + str(durationFreqInHz) + " Hz")
         self.setProperColorOfGuiTexts("freq")
         
-    def paintSpectogramToLabel(self):
+    def paintSpectogramToLabel(self, spectrogram):
         labelToPaint = self.findChild(QLabel,"spectogramLabel")
-        img = cv2.imread("./spectogram.png")
-        height, width, channel = img.shape
+        img = fun1.pyPlotToCv2Img(spectrogram)
+        height= img.shape[0]
+        width = img.shape[1]
         bytesPerLine = 3 * width
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         pixMap = QPixmap(qImg)
@@ -155,36 +186,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def turnOnGui(self):
         self.findChild(QSpinBox ,"startImgSpinBox_T").setEnabled(True)
         self.findChild(QSpinBox ,"startImgSpinBox_F").setEnabled(True)
-        self.findChild(QSpinBox ,"imgDurationSpinBox_T").setEnabled(True)
-        self.findChild(QSpinBox ,"imgDurationSpinBox_F").setEnabled(True)
+        self.findChild(QCheckBox,"scalingChekbox").setEnabled(True)
+        self.findChild(QSpinBox ,"imgDurationSpinBox_T").setValue(self.imgData.shape[1])
+        self.findChild(QSpinBox ,"imgDurationSpinBox_F").setValue(self.imgData.shape[0])
         
+        self.findChild(QPushButton ,"resetSpectLabelButton").setEnabled(True)
+        self.findChild(QPushButton ,"setImgInSpectButton").setEnabled(True)
+        self.findChild(QPushButton ,"saveResultsButton").setEnabled(True)
+
         
     def calculateSTFT(self):
         if(len(self.audioData) == 0):
             self.printError("some error")
             return
         stft = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE)
-        self.stftModul, self.stftPhase = fun1.splitCompNum(stft)
+        self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stft)
         timeFramesLabel = self.findChild(QLabel,"totalTimeFramesLabel")
         freqFramesLabel = self.findChild(QLabel,"totalFreqFramesLabel")
-        timeFramesLabel.setText("klatek częst. = " + str(self.stftModul.shape[0]))
-        freqFramesLabel.setText("klatek czasowych = " + str(self.stftModul.shape[1]))
-        
-        turnOnGui = self.stftModul.shape[0] > 0 and self.stftModul.shape[1] > 0 and len(self.imgData) > 0
+        timeFramesLabel.setText("klatek częst. = " + str(self.stftModulOrg.shape[0]))
+        freqFramesLabel.setText("klatek czasowych = " + str(self.stftModulOrg.shape[1]))
+        maxFreq = (1 + self.FRAME_SIZE / 2) * self.samplingRate / self.FRAME_SIZE
+        self.hzPerFreqFrame = maxFreq / stft.shape[0]
+        self.miliSecsForTimeFrame = self.fileDurationMs / stft.shape[1]
+        turnOnGui = self.stftModulOrg.shape[0] > 0 and self.stftModulOrg.shape[1] > 0 and len(self.imgData) > 0
         if(turnOnGui):
             self.turnOnGui()
-        
-        fun1.paintSpectogram(stft, self.SAMPLING_RATE, self.HOP_SIZE)
-        self.paintSpectogramToLabel()
-        
-    def calculateRecomendedValues():
-        print("calculateRecomendedValues")
-
+        spectrogram = fun1.paintSpectogram(self.stftModulOrg, self.samplingRate, self.HOP_SIZE)
+        self.paintSpectogramToLabel(spectrogram)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)  
     window = MainWindow()
     window.show()
-    window.fillAudioLabels(0,0)
     window.fillImageLabels(fileName = "Obraz: ", width=0 , height=0, minLum=0, maxLum=0)
     sys.exit(app.exec_())

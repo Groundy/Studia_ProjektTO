@@ -41,6 +41,241 @@
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout">
+      <item row="5" column="0" colspan="3">
+       <widget class="QLabel" name="spectogramLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>750</width>
+          <height>350</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="5" column="0" colspan="6">
+         <widget class="QCheckBox" name="scalingChekbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Skaluj obraz</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="3" colspan="3">
+         <widget class="QLabel" name="calculatedFreqToUse">
+          <property name="text">
+           <string>= 0 Hz</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QSpinBox" name="imgDurationSpinBox_F">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="totalTimeFramesLabel">
+          <property name="text">
+           <string>klatek czasowych = </string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="6">
+         <widget class="QPushButton" name="calculateSTFTButton">
+          <property name="text">
+           <string>Oblicz spektogram obrazu oryginalnego obrazu</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QSpinBox" name="startImgSpinBox_T">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1" colspan="2">
+         <widget class="QLabel" name="constLabel2">
+          <property name="maximumSize">
+           <size>
+            <width>130</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>klatek częstotliwościowych</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" colspan="4">
+         <widget class="QLabel" name="totalFreqFramesLabel">
+          <property name="text">
+           <string>klatek częst = </string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QSpinBox" name="startImgSpinBox_F">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="3" colspan="3">
+         <widget class="QLabel" name="calculatedTimeToUse">
+          <property name="text">
+           <string>= 0 ms</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" colspan="2">
+         <widget class="QLabel" name="constLabel4">
+          <property name="text">
+           <string>klatek częstotliwościowych</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3" colspan="3">
+         <widget class="QLabel" name="calculatedTimeToStart">
+          <property name="text">
+           <string>= 0 ms</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QSpinBox" name="imgDurationSpinBox_T">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QLabel" name="constLabel3">
+          <property name="text">
+           <string>klatek czasowych</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="6">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="resetSpectLabelButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Rysuj czysty spektogram</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="setImgInSpectButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Umieść obraz w spektogramie</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveResultsButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Zapis wyniki</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="6" column="1" colspan="2">
+         <widget class="QLabel" name="constLabel1">
+          <property name="maximumSize">
+           <size>
+            <width>130</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>klatek czasowych</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3" colspan="3">
+         <widget class="QLabel" name="calculatedFreqToStart">
+          <property name="text">
+           <string>= 0 Hz</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="6" rowspan="8">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0" rowspan="4">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="2" rowspan="4">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="1" column="1" rowspan="2">
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="2" column="0">
@@ -93,6 +328,12 @@
         </item>
         <item row="1" column="1" colspan="2">
          <widget class="QLabel" name="imgFileNameLabel">
+          <property name="minimumSize">
+           <size>
+            <width>350</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Obraz: </string>
           </property>
@@ -107,6 +348,12 @@
         </item>
         <item row="0" column="1" colspan="2">
          <widget class="QLabel" name="audioFileNameLabel">
+          <property name="minimumSize">
+           <size>
+            <width>350</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Audio:</string>
           </property>
@@ -120,220 +367,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item row="1" column="0" rowspan="4">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="5" column="0" colspan="3">
-       <widget class="QLabel" name="spectogramLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>750</width>
-          <height>350</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="2" column="2">
-         <widget class="QLabel" name="calculatedFrameToStart_T">
-          <property name="text">
-           <string>= 0 klatek czasowych</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QSpinBox" name="startImgSpinBox_T">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>999999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLabel" name="constLabel2">
-          <property name="text">
-           <string>wysokość na spektogrami[x100Hz]</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3">
-         <widget class="QLabel" name="recomendedFrames_F">
-          <property name="text">
-           <string>Rekomendowane = 0</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="constLabel4">
-          <property name="text">
-           <string>początek obrazu na osi częst. [x100Hz]</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QSpinBox" name="imgDurationSpinBox_T">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>999999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="totalTimeFramesLabel">
-          <property name="text">
-           <string>klatek czasowych = </string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="constLabel1">
-          <property name="text">
-           <string>czas trwania obrazu [x0.1 s]</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="constLabel3">
-          <property name="text">
-           <string>początek obrazu na osi czasu [x0.1s]]</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabel" name="calculatedFrameToStart_F">
-          <property name="text">
-           <string>= 0 klatek częstotliwościowych</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3">
-         <widget class="QLabel" name="recomendedFrames_T">
-          <property name="text">
-           <string>Rekomendowane = 0</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QSpinBox" name="startImgSpinBox_F">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>999999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QPushButton" name="calculateSTFTButton">
-          <property name="text">
-           <string>Oblicz spektogram obrazu oryginalnego obrazu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QLabel" name="totalFreqFramesLabel">
-          <property name="text">
-           <string>klatek częst = </string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QLabel" name="calculatedFramesToUse_T">
-          <property name="text">
-           <string>= 0 klatek czasowych</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QSpinBox" name="imgDurationSpinBox_F">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>999999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2">
-         <widget class="QLabel" name="calculatedFramesToUse_F">
-          <property name="text">
-           <string>= 0 klatek częstotliwościowych</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0" colspan="4">
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>Rysuj czysty spektogram</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="SpectogramtittleLabel">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Spektogram</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="text">
-             <string>Umieść obraz w spektogramie</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="2" rowspan="4">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </item>
@@ -454,6 +487,70 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>scalingChekbox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>allowScalingChechBoxChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>500</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>424</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveResultsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>saveResultsToFiles()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>644</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>424</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>resetSpectLabelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>resetLabelToUnmodifiedSpectrogram()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>381</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>424</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>setImgInSpectButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>addImgToTmpSpectrogram()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>526</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>424</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>chooseAudioFileButtonPressed()</slot>
@@ -463,6 +560,9 @@
   <slot>durationTimeChanged()</slot>
   <slot>frequencyDurationChanged()</slot>
   <slot>calculateSTFT()</slot>
-  <slot>calculateRecomendedValues()</slot>
+  <slot>allowScalingChechBoxChanged()</slot>
+  <slot>resetLabelToUnmodifiedSpectrogram()</slot>
+  <slot>addImgToTmpSpectrogram()</slot>
+  <slot>saveResultsToFiles()</slot>
  </slots>
 </ui>
