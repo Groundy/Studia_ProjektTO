@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QMessageBox, QCheckBo
 import fun1, fun2
 import librosa 
 from PyQt5.QtGui import QImage,QPixmap, QPalette, QColor
-import cv2
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
 
@@ -73,7 +72,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.paintSpectogramToLabel(figure)
         
     def saveResultsToFiles(self):
-        print("saveResultsToFiles")
+        imgIsntAdded = (self.stftModulOrg != self.stftModulModified).all()
+        if(imgIsntAdded):
+            print("img not added!!!!!!!!!!!")
+            return
+        
+        folderPath = QFileDialog.getExistingDirectory(self, 'Select Folder')
+        fun1.saveFiles(self.stftModulModified,
+                       self.stftPhaseOrg,
+                       folderPath,
+                       self.startFrameTime,
+                       self.startFrameFreq,
+                       self.durationFrameTime,
+                       self.durationFrameFreq,
+                       self.amplification,
+                       self.FRAME_SIZE,
+                       self.HOP_SIZE,
+                       self.samplingRate)
         
     def fillImageLabels(self, fileName, width , height, minLum, maxLum):
         widthLabel = self.findChild(QLabel,"heightLabel")

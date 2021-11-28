@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import soundfile as sf
 import cmath
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+#from PyQt5 import QtCore
+from PyQt5.QtCore import QDateTime, QSettings
+
 def readAudioFile(absPath):
     audioData, samplingRate = librosa.load(absPath,sr=None)
     duration = int(1000*(len(audioData))/samplingRate)
@@ -106,3 +109,32 @@ def pyPlotToCv2Img(fig):
     # it still is rgb, convert to opencv's default bgr
     graph_image = cv2.cvtColor(graph_image,cv2.COLOR_RGB2BGR)
     return graph_image
+
+
+def saveFiles(stft_modul, stft_phase, pathToFolder, startT, startF, durationT,
+              durationF, amplification, frame_size, hop_size, samplingRate):
+    
+    currentTimeStr = QDateTime.currentDateTime().toString("hh_mm_ss_")
+    baseFileName = pathToFolder + "/" + currentTimeStr
+    audioFileName = baseFileName + "audio.wav"
+    keyFileName =  baseFileName + "key.ini"
+    imgFileName = baseFileName + "img.png"
+    
+    mergedStft = mergeCompNum(stft_modul, stft_phase)
+    stftToWavFile(mergedStft,audioFileName,frame_size,hop_size,samplingRate)
+    
+    figure = paintSpectogram(stft_modul,samplingRate,hop_size)
+    figure.savefig(imgFileName)
+    
+    settingsFile = QSettings(keyFileName, QSettings.IniFormat)
+    settingsFile.setValue("startT",startT)
+    settingsFile.setValue("startF",startF)
+    settingsFile.setValue("durationT",durationT)
+    settingsFile.setValue("durationF",durationF)
+    settingsFile.setValue("amplification",amplification)
+    settingsFile.setValue("frame_size",frame_size)
+    settingsFile.setValue("hop_size",hop_size)
+    settingsFile.setValue("samplingRate",samplingRate)
+    settingsFile.save()
+    
+    
