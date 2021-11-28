@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QMessageBox, QCheckBox, QPushButton
+from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QMessageBox, QCheckBox, QPushButton, QDoubleSpinBox
 import fun1, fun2
 import librosa 
 from PyQt5.QtGui import QImage,QPixmap, QPalette, QColor
@@ -25,6 +25,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     durationFrameFreq = 0
     miliSecsForTimeFrame = 0
     hzPerFreqFrame = 0
+    amplification = float(0)
     
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
@@ -34,6 +35,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def printError(self, textToDisplay):
         messageBox = QMessageBox(text = textToDisplay)
         messageBox.exec_()
+        
+    def aplifierSpinBoxChanged(self):
+        value = float(self.findChild(QDoubleSpinBox ,"amplifierSpinBox").value())
+        if(value >= -30 and value <= 0):
+            self.amplification = value
     
     def fillAudioLabels(self):
         durationMsec = self.fileDurationMs
@@ -61,7 +67,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                                    self.imgData,
                                                    self.stftModulOrg,
                                                    self.durationFrameTime,
-                                                   self.durationFrameFreq)
+                                                   self.durationFrameFreq,
+                                                   self.amplification)
         figure = fun1.paintSpectogram(self.stftModulModified, self.samplingRate, self.HOP_SIZE)
         self.paintSpectogramToLabel(figure)
         
@@ -145,8 +152,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.frequencyDurationChanged()
         
     def printScaleRatioToGui(self):
-        a = np.float(self.durationFrameFreq)
-        b = np.float(self.durationFrameTime)
+        a = float(self.durationFrameFreq)
+        b = float(self.durationFrameTime)
         label = self.findChild(QLabel,"WToHRatioLabel_mod")
         if( a > 0 and b > 0 ):
             dimRatio =  a/b
@@ -205,6 +212,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.findChild(QPushButton ,"resetSpectLabelButton").setEnabled(True)
         self.findChild(QPushButton ,"setImgInSpectButton").setEnabled(True)
         self.findChild(QPushButton ,"saveResultsButton").setEnabled(True)
+        self.findChild(QDoubleSpinBox ,"amplifierSpinBox").setEnabled(True)
 
         
     def calculateSTFT(self):
@@ -219,7 +227,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         timeFramesLabel.setText("klatek częst. = " + str(self.stftModulOrg.shape[0]))
         freqFramesLabel.setText("klatek czasowych = " + str(self.stftModulOrg.shape[1]))
         widthHightRatioLabelOrg = self.findChild(QLabel,"WToHRatioLabel_org")
-        dimRatio = np.float(self.imgData.shape[0]) / np.float(self.imgData.shape[1])
+        dimRatio = float(self.imgData.shape[0]) / float(self.imgData.shape[1])
         dimRatioStr = str(round(dimRatio, 2))
         widthHightRatioLabelOrg.setText("Oryginalny stosunek W/H : "+dimRatioStr)
         

@@ -62,20 +62,24 @@
       </item>
       <item row="3" column="1">
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="7" column="3" colspan="3">
-         <widget class="QLabel" name="calculatedFreqToUse">
+        <item row="4" column="1" colspan="2">
+         <widget class="QLabel" name="constLabel4">
           <property name="text">
-           <string>= 0 Hz</string>
+           <string>klatek częstotliwościowych</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
-         <widget class="QSpinBox" name="imgDurationSpinBox_F">
-          <property name="enabled">
-           <bool>false</bool>
+        <item row="2" column="3" colspan="4">
+         <widget class="QLabel" name="totalFreqFramesLabel">
+          <property name="text">
+           <string>klatek częst = </string>
           </property>
-          <property name="maximum">
-           <number>999999999</number>
+         </widget>
+        </item>
+        <item row="4" column="3" colspan="4">
+         <widget class="QLabel" name="calculatedFreqToStart">
+          <property name="text">
+           <string>= 0 Hz</string>
           </property>
          </widget>
         </item>
@@ -89,7 +93,86 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="1" colspan="2">
+        <item row="3" column="1" colspan="2">
+         <widget class="QLabel" name="constLabel3">
+          <property name="text">
+           <string>klatek czasowych</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QSpinBox" name="imgDurationSpinBox_F">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QLabel" name="totalTimeFramesLabel">
+          <property name="text">
+           <string>klatek czasowych = </string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="3" colspan="3">
+         <widget class="QLabel" name="calculatedTimeToUse">
+          <property name="text">
+           <string>= 0 ms</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="6">
+         <widget class="QLabel" name="WToHRatioLabel_org">
+          <property name="text">
+           <string>Oryginalny stosunek W/H : </string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="6">
+         <widget class="QLabel" name="WToHRatioLabel_mod">
+          <property name="text">
+           <string>Prszekalowany stosunek W/H :        </string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3" colspan="4">
+         <widget class="QLabel" name="calculatedTimeToStart">
+          <property name="text">
+           <string>= 0 ms</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="7">
+         <widget class="QPushButton" name="calculateSTFTButton">
+          <property name="text">
+           <string>Oblicz spektogram obrazu oryginalnego obrazu</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="3" colspan="3">
+         <widget class="QLabel" name="calculatedFreqToUse">
+          <property name="text">
+           <string>= 0 Hz</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1" colspan="2">
+         <widget class="QLabel" name="constLabel1">
+          <property name="maximumSize">
+           <size>
+            <width>130</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>klatek czasowych</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1" colspan="2">
          <widget class="QLabel" name="constLabel2">
           <property name="maximumSize">
            <size>
@@ -112,103 +195,7 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="3" colspan="3">
-         <widget class="QLabel" name="calculatedTimeToUse">
-          <property name="text">
-           <string>= 0 ms</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" colspan="2">
-         <widget class="QLabel" name="constLabel4">
-          <property name="text">
-           <string>klatek częstotliwościowych</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QSpinBox" name="imgDurationSpinBox_T">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>999999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QLabel" name="constLabel3">
-          <property name="text">
-           <string>klatek czasowych</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1" colspan="2">
-         <widget class="QLabel" name="constLabel1">
-          <property name="maximumSize">
-           <size>
-            <width>130</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>klatek czasowych</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="6">
-         <widget class="QLabel" name="WToHRatioLabel_org">
-          <property name="text">
-           <string>Oryginalny stosunek W/H : </string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="7">
-         <widget class="QCheckBox" name="scalingChekbox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Skaluj obraz</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3" colspan="4">
-         <widget class="QLabel" name="calculatedFreqToStart">
-          <property name="text">
-           <string>= 0 Hz</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3" colspan="4">
-         <widget class="QLabel" name="calculatedTimeToStart">
-          <property name="text">
-           <string>= 0 ms</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="7">
-         <widget class="QPushButton" name="calculateSTFTButton">
-          <property name="text">
-           <string>Oblicz spektogram obrazu oryginalnego obrazu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="3">
-         <widget class="QLabel" name="totalTimeFramesLabel">
-          <property name="text">
-           <string>klatek czasowych = </string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" colspan="4">
-         <widget class="QLabel" name="totalFreqFramesLabel">
-          <property name="text">
-           <string>klatek częst = </string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0" colspan="7">
+        <item row="10" column="0" colspan="7">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QPushButton" name="resetSpectLabelButton">
@@ -242,12 +229,74 @@
           </item>
          </layout>
         </item>
-        <item row="7" column="6">
-         <widget class="QLabel" name="WToHRatioLabel_mod">
-          <property name="text">
-           <string>Prszekalowany stosunek W/H :        </string>
+        <item row="8" column="0">
+         <widget class="QSpinBox" name="imgDurationSpinBox_T">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
           </property>
          </widget>
+        </item>
+        <item row="5" column="0" rowspan="3" colspan="7">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QCheckBox" name="scalingChekbox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Skaluj obraz</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="amplifierSpinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>55</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>-30.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="constLabel5">
+            <property name="text">
+             <string>wzmocneinei[dB]</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -552,6 +601,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>amplifierSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>aplifierSpinBoxChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>628</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>424</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>chooseAudioFileButtonPressed()</slot>
@@ -565,5 +630,6 @@
   <slot>resetLabelToUnmodifiedSpectrogram()</slot>
   <slot>addImgToTmpSpectrogram()</slot>
   <slot>saveResultsToFiles()</slot>
+  <slot>aplifierSpinBoxChanged()</slot>
  </slots>
 </ui>
