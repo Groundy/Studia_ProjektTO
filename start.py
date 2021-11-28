@@ -14,6 +14,8 @@ nieco pomagac. Tego efektu nie widac na spektrogramie rysowanym w Spyder ale wid
 2. Trzeba zrobić odczytywanie z pliku .ini parametru, z tymi parametrami mozna zapisany plik audio konwertowac do stft i z parmatero odcztywac
 kolejne pixele z odpowiedniego fragmentu 
 3. dodac do gui jakis log, aktualnie dluzsze obliczenia mogą wyglądać na zawieszenie sie programu. 
+4. dodac do gui odtwarzacz dzwieku
+5. jezeli dzwiek czytamy w stereo to zapisuje sie do mono, byc moze to jest przyczyna problemow z pkt 1.
 """
 
 
