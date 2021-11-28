@@ -135,6 +135,3 @@ def saveFiles(stft_modul, stft_phase, pathToFolder, startT, startF, durationT,
     settingsFile.setValue("frame_size",frame_size)
     settingsFile.setValue("hop_size",hop_size)
     settingsFile.setValue("samplingRate",samplingRate)
-    settingsFile.save()
-    
-    

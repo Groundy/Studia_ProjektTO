@@ -8,6 +8,15 @@ from PyQt5.QtGui import QImage,QPixmap, QPalette, QColor
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
 
+"""
+1. obraz w spektrogramie sie dziwnie zachowuje jezeli zapisuje sie go zbyt wczesniej, zmiejszenie mocy o 15dB wydaje sie
+nieco pomagac. Tego efektu nie widac na spektrogramie rysowanym w Spyder ale widac w izotopeRX4
+2. Trzeba zrobić odczytywanie z pliku .ini parametru, z tymi parametrami mozna zapisany plik audio konwertowac do stft i z parmatero odcztywac
+kolejne pixele z odpowiedniego fragmentu 
+3. dodac do gui jakis log, aktualnie dluzsze obliczenia mogą wyglądać na zawieszenie sie programu. 
+"""
+
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     audioData = None
     samplingRate = 0
