@@ -119,6 +119,7 @@ def saveFiles(stft_modul, stft_phase, pathToFolder, startT, startF, durationT,
     audioFileName = baseFileName + "audio.wav"
     keyFileName =  baseFileName + "key.ini"
     imgFileName = baseFileName + "img.png"
+    imgFileName2 = baseFileName + "img2.png"
     
     mergedStft = mergeCompNum(stft_modul, stft_phase)
     stftToWavFile(mergedStft,audioFileName,frame_size,hop_size,samplingRate)
@@ -135,3 +136,13 @@ def saveFiles(stft_modul, stft_phase, pathToFolder, startT, startF, durationT,
     settingsFile.setValue("frame_size",frame_size)
     settingsFile.setValue("hop_size",hop_size)
     settingsFile.setValue("samplingRate",samplingRate)
+    
+    #oczyt zapisanego dzwieku i ponowna zmiana do spectrogramu
+    audioDataRead, duration, samplingRateRead = readAudioFile(audioFileName)
+    stftRead = librosa.stft(audioDataRead, n_fft=frame_size, hop_length=hop_size)
+    stftModulRead, stftPhaseRead = splitCompNum(stftRead)
+    spectogramRead = paintSpectogram(stftModulRead,samplingRateRead,hop_size)
+    spectogramRead.savefig(imgFileName2)
+    return spectogramRead
+    
+    

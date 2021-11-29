@@ -89,7 +89,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             return
         
         folderPath = QFileDialog.getExistingDirectory(self, 'Select Folder')
-        fun1.saveFiles(self.stftModulModified,
+        spectogramReadFromWavFile = fun1.saveFiles(self.stftModulModified,
                        self.stftPhaseOrg,
                        folderPath,
                        self.startFrameTime,
@@ -100,6 +100,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                        self.FRAME_SIZE,
                        self.HOP_SIZE,
                        self.samplingRate)
+        self.paintSpectogramToLabel(spectogramReadFromWavFile)
         
     def fillImageLabels(self, fileName, width , height, minLum, maxLum):
         widthLabel = self.findChild(QLabel,"heightLabel")
