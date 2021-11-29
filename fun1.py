@@ -10,6 +10,9 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 #from PyQt5 import QtCore
 from PyQt5.QtCore import QDateTime, QSettings
 
+windowType = "nuttall"
+scale = 0.1#parametr ktory ogranicza wartosc maksymalna obrazu tak aby ta moc "nie wylewala sie" na inne czestotliwosci
+
 def readAudioFile(absPath):
     audioData, samplingRate = librosa.load(absPath,sr=None)
     duration = int(1000*(len(audioData))/samplingRate)
@@ -49,8 +52,10 @@ def mapImgToSTFT(startX, startY, monoImg, stft, durationX = 0, durationY = 0, am
         return
     
     minVal = np.min(stft)
-    maxVal = np.max(stft)
-    valPerPix = (maxVal - minVal) / 255
+    maxVal = np.max(stft) * scale
+    if(maxVal <= minVal):
+        print("Error scaling pix lum")
+    valPerPix = (maxVal - minVal) / 256
     
     
     imgCpy = monoImg.copy()
@@ -75,7 +80,7 @@ def mapImgToSTFT(startX, startY, monoImg, stft, durationX = 0, durationY = 0, am
     return stftCpy
 
 def stftToWavFile(stft, fileName, frame_size, hop_size ,samplingRate = 44100):
-    audioData = librosa.istft(stft, hop_size, frame_size)
+    audioData = librosa.istft(stft, hop_size, frame_size,window=windowType)
     sf.write(fileName, audioData, samplingRate, 'PCM_24')
     
 def mergeCompNum(modulArr, phaseArr):
@@ -116,18 +121,31 @@ def saveFiles(stft_modul, stft_phase, pathToFolder, startT, startF, durationT,
     
     currentTimeStr = QDateTime.currentDateTime().toString("hh_mm_ss_")
     baseFileName = pathToFolder + "/" + currentTimeStr
-    audioFileName = baseFileName + "audio.wav"
-    keyFileName =  baseFileName + "key.ini"
-    imgFileName = baseFileName + "img.png"
-    imgFileName2 = baseFileName + "img2.png"
+    audio_FileName = baseFileName + "audio.wav"
+    key_FileName =  baseFileName + "key.ini"
+    spectogramModified_FileName = baseFileName + "spect1.png"
+    spectogramRead_FileName = baseFileName + "spect2.png"
+    imgCalculated_FileName = baseFileName + "imgCalculated.png"
+    imgRead_FileName = baseFileName + "imgRead.png"
     
     mergedStft = mergeCompNum(stft_modul, stft_phase)
-    stftToWavFile(mergedStft,audioFileName,frame_size,hop_size,samplingRate)
+    stftToWavFile(mergedStft,audio_FileName,frame_size,hop_size,samplingRate)
     
     figure = paintSpectogram(stft_modul,samplingRate,hop_size)
-    figure.savefig(imgFileName)
+    figure.savefig(spectogramModified_FileName)
     
-    settingsFile = QSettings(keyFileName, QSettings.IniFormat)
+    #oczyt zapisanego dzwieku i ponowna zmiana do spectrogramu
+    audioDataRead, duration, samplingRateRead = readAudioFile(audio_FileName)
+    stftRead = librosa.stft(audioDataRead, n_fft=frame_size, hop_length=hop_size,window=windowType)
+    stftModulRead, stftPhaseRead = splitCompNum(stftRead)
+    spectogramRead = paintSpectogram(stftModulRead,samplingRateRead,hop_size)
+    spectogramRead.savefig(spectogramRead_FileName)
+    imgRead, imgCalculated, mad = compareTwoModArrays(stftModulRead, stft_modul, startT, startF, durationT, durationF, pathToFolder + "/")
+    
+    cv2.imwrite(imgCalculated_FileName,imgCalculated)
+    cv2.imwrite(imgRead_FileName,imgRead)
+    
+    settingsFile = QSettings(key_FileName, QSettings.IniFormat)
     settingsFile.setValue("startT",startT)
     settingsFile.setValue("startF",startF)
     settingsFile.setValue("durationT",durationT)
@@ -136,13 +154,32 @@ def saveFiles(stft_modul, stft_phase, pathToFolder, startT, startF, durationT,
     settingsFile.setValue("frame_size",frame_size)
     settingsFile.setValue("hop_size",hop_size)
     settingsFile.setValue("samplingRate",samplingRate)
+    settingsFile.setValue("MAD",str(mad))
     
-    #oczyt zapisanego dzwieku i ponowna zmiana do spectrogramu
-    audioDataRead, duration, samplingRateRead = readAudioFile(audioFileName)
-    stftRead = librosa.stft(audioDataRead, n_fft=frame_size, hop_length=hop_size)
-    stftModulRead, stftPhaseRead = splitCompNum(stftRead)
-    spectogramRead = paintSpectogram(stftModulRead,samplingRateRead,hop_size)
-    spectogramRead.savefig(imgFileName2)
     return spectogramRead
+
+def compareTwoModArrays(stftModulRead, stftModulCalculated, startT, startF, durationT, durationF, pathToFolder = "./"):
+    f_start = startF
+    f_end = durationF + startF
+    t_start = startT
+    t_end = durationT + startT
+    imgCalculated = stftModulCalculated[f_start : f_end , t_start : t_end]
+    imgRead = stftModulRead[f_start : f_end , t_start : t_end]
+    #odwracania macierzy do gory nogami
+    imgCalculated = np.flipud(imgCalculated)
+    imgRead = np.flipud(imgRead)
     
+    imgCalculated = 255 * (imgCalculated / np.max(imgCalculated))
+    imgRead = 255 * (imgRead / np.max(imgRead))              
+    
+    imgCalculated = imgCalculated.astype(int)
+    imgRead = imgRead.astype(int)
+    
+    #cv2.imwrite(pathToFolder + "imgCalculated.png",imgCalculated)
+    #cv2.imwrite(pathToFolder + "imgRead.png",imgRead)
+    
+    diffSum = np.sum(abs(imgRead - imgCalculated))
+    mad = diffSum/(durationT * durationF)
+    mad = round(mad,2)
+    return imgRead, imgCalculated, mad
     

@@ -246,7 +246,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if(len(self.audioData) == 0):
             self.printError("some error")
             return
-        stft = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE)
+        stft = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE,window=fun1.windowType)
         self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stft)
         
         timeFramesLabel = self.findChild(QLabel,"totalTimeFramesLabel")
