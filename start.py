@@ -9,13 +9,11 @@ from PyQt5.QtGui import QImage,QPixmap, QPalette, QColor
 Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
 
 """
-1. obraz w spektrogramie sie dziwnie zachowuje jezeli zapisuje sie go zbyt wczesniej, zmiejszenie mocy o 15dB wydaje sie
-nieco pomagac. Tego efektu nie widac na spektrogramie rysowanym w Spyder ale widac w izotopeRX4
-2. Trzeba zrobić odczytywanie z pliku .ini parametru, z tymi parametrami mozna zapisany plik audio konwertowac do stft i z parmatero odcztywac
-kolejne pixele z odpowiedniego fragmentu 
+1. obraz w spektrogramie sie dziwnie zachowuje jezeli zapisuje sie go zbyt wczesniej,
+2. Obecnie porowynywanie obrazow to tak naprawde porownywanie ich rozciagnietych histogramow,
+to jest zle ale to mozna poparawic na oddawanie finalowego projektu.
 3. dodac do gui jakis log, aktualnie dluzsze obliczenia mogą wyglądać na zawieszenie sie programu. 
-4. dodac do gui odtwarzacz dzwieku
-5. jezeli dzwiek czytamy w stereo to zapisuje sie do mono, byc moze to jest przyczyna problemow z pkt 1.
+4. jezeli dzwiek czytamy w stereo to zapisuje sie do mono
 """
 
 

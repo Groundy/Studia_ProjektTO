@@ -55,7 +55,7 @@ def mapImgToSTFT(startX, startY, monoImg, stft, durationX = 0, durationY = 0, am
     maxVal = np.max(stft) * scale
     if(maxVal <= minVal):
         print("Error scaling pix lum")
-    valPerPix = (maxVal - minVal) / 256
+    valPerPix = (maxVal - minVal) / 255
     
     
     imgCpy = monoImg.copy()
