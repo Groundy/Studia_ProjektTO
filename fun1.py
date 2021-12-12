@@ -44,7 +44,7 @@ def paintSpectogram(Y, sr, hop_length, y_axis="linear" ):
     return figure
     
 def mapImgToSTFT(ptr, startX, startY, monoImg, stft, durationX = 0, durationY = 0, amplifierDb = -10):
-    Log(ptr,"Rozpoczęto mapowanie opracu do spektrogramu")
+    Log(ptr,"Rozpoczęto mapowanie obrazu do spektrogramu")
     
     #wzmocnienie nie powinno byc wieksze niz 0
     needToScaleImg = durationX != monoImg.shape[1] and durationY != monoImg.shape[0]
@@ -129,8 +129,10 @@ def Log(ptr, text):
 
 def saveFiles(ptr):
     Log(ptr,"Zapisywanie plików na dysk")
-    folderPath = QFileDialog.getExistingDirectory(ptr, 'Select Folder')
-    
+    folderPath = str(QFileDialog.getExistingDirectory(ptr, 'Select Folder'))
+    if(len(folderPath) == 0):
+        Log(ptr,"Nie wybrano folderu do zapisu")
+        
     currentTimeStr = QDateTime.currentDateTime().toString("hh_mm_ss_")
     baseFileName = folderPath + "/" + currentTimeStr
     audio_FileName = baseFileName + "audio.wav"
@@ -275,5 +277,4 @@ def readSavedValuesAndPrintThemToGUI(ptr):
     compareTwoModArrays(stftModulRead,ptr.stftModulModified,)
     
     return stftModulRead, spectogramRead
-"""
 """

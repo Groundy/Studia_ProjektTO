@@ -217,7 +217,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if(len(self.audioData) == 0):
             fun1.Log(self, "[ERROR] Nie wybrano pliku dzwiękowego")
             return
-        fun1.Log(self, "[ERROR] Wyliczanie spektrogramu oryginalnego pliku")
+        fun1.Log(self, "Wyliczanie spektrogramu oryginalnego pliku")
         stft = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE,window=fun1.windowType)
         self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stft)
         
