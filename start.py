@@ -1,21 +1,12 @@
 import sys
 import numpy as np
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QMessageBox, QCheckBox, QPushButton, QDoubleSpinBox
-import fun1, fun2
+from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QCheckBox, QPushButton, QDoubleSpinBox
+import fun1
 import librosa 
-from PyQt5.QtGui import QImage,QPixmap, QPalette, QColor
+from PyQt5.QtGui import QImage,QPixmap, QColor
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
-
-"""
-1. obraz w spektrogramie sie dziwnie zachowuje jezeli zapisuje sie go zbyt wczesniej,
-2. Obecnie porowynywanie obrazow to tak naprawde porownywanie ich rozciagnietych histogramow,
-to jest zle ale to mozna poparawic na oddawanie finalowego projektu.
-3. dodac do gui jakis log, aktualnie dluzsze obliczenia mogą wyglądać na zawieszenie sie programu. 
-4. jezeli dzwiek czytamy w stereo to zapisuje sie do mono
-"""
-
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     audioData = None
@@ -39,14 +30,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         QtWidgets.QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
-    
-    def printError(self, textToDisplay):
-        messageBox = QMessageBox(text = textToDisplay)
-        messageBox.exec_()
         
     def aplifierSpinBoxChanged(self):
         value = float(self.findChild(QDoubleSpinBox ,"amplifierSpinBox").value())
-        if(value >= -30 and value <= 0):
+        if(value >= -40 and value <= -10):
             self.amplification = value
     
     def fillAudioLabels(self):
@@ -70,35 +57,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.paintSpectogramToLabel(figure)
         
     def addImgToTmpSpectrogram(self):
-        self.stftModulModified = fun1.mapImgToSTFT(self.startFrameTime,
-                                                   self.startFrameFreq,
-                                                   self.imgData,
-                                                   self.stftModulOrg,
-                                                   self.durationFrameTime,
-                                                   self.durationFrameFreq,
-                                                   self.amplification)
+        self.amplification = self.findChild(QDoubleSpinBox ,"amplifierSpinBox").value()
+        self.stftModulModified = fun1.mapImgToSTFT(
+            self,
+            self.startFrameTime,
+            self.startFrameFreq,
+            self.imgData,
+            self.stftModulOrg,
+            self.durationFrameTime,
+            self.durationFrameFreq,
+            self.amplification)
         figure = fun1.paintSpectogram(self.stftModulModified, self.samplingRate, self.HOP_SIZE)
         self.paintSpectogramToLabel(figure)
         
     def saveResultsToFiles(self):
-        imgIsntAdded = (self.stftModulOrg != self.stftModulModified).all()
-        if(imgIsntAdded):
-            print("img not added!!!!!!!!!!!")
-            return
-        
-        folderPath = QFileDialog.getExistingDirectory(self, 'Select Folder')
-        spectogramReadFromWavFile = fun1.saveFiles(self.stftModulModified,
-                       self.stftPhaseOrg,
-                       folderPath,
-                       self.startFrameTime,
-                       self.startFrameFreq,
-                       self.durationFrameTime,
-                       self.durationFrameFreq,
-                       self.amplification,
-                       self.FRAME_SIZE,
-                       self.HOP_SIZE,
-                       self.samplingRate)
-        self.paintSpectogramToLabel(spectogramReadFromWavFile)
+        fun1.saveFiles(self)
         
     def fillImageLabels(self, fileName, width , height, minLum, maxLum):
         widthLabel = self.findChild(QLabel,"heightLabel")
@@ -177,15 +150,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.frequencyDurationChanged()
         
     def printScaleRatioToGui(self):
-        a = float(self.durationFrameFreq)
-        b = float(self.durationFrameTime)
-        label = self.findChild(QLabel,"WToHRatioLabel_mod")
-        if( a > 0 and b > 0 ):
-            dimRatio =  a/b
+        h = float(self.durationFrameFreq)
+        w = float(self.durationFrameTime)
+        properValues =  h > 0 and w > 0 
+        if(properValues):
+            dimRatio =  w/h
             dimRatioStr = str(round(dimRatio, 2))
-            label.setText("Przeskalowany stosunek W/H : "+ dimRatioStr)
-        else:
-            label.setText("Złe parametry skalowania")
+            textToSet = "Przeskalowany stosunek W/H : "+ dimRatioStr if properValues else "Złe parametry skalowania"     
+            label = self.findChild(QLabel,"WToHRatioLabel_mod")
+            label.setText(textToSet)
         
     def startFrequencyChanged(self):
         spinBox = self.findChild(QSpinBox,"startImgSpinBox_F")
@@ -242,8 +215,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
     def calculateSTFT(self):
         if(len(self.audioData) == 0):
-            self.printError("some error")
+            fun1.Log(self, "[ERROR] Nie wybrano pliku dzwiękowego")
             return
+        fun1.Log(self, "[ERROR] Wyliczanie spektrogramu oryginalnego pliku")
         stft = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE,window=fun1.windowType)
         self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stft)
         
@@ -264,6 +238,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.turnOnGui()
         spectrogram = fun1.paintSpectogram(self.stftModulOrg, self.samplingRate, self.HOP_SIZE)
         self.paintSpectogramToLabel(spectrogram)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)  
