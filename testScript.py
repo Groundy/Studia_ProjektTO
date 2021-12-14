@@ -45,8 +45,8 @@ def doSingleCalc(posX, posY, amp):
     fileName = pathToResultFolder + str(-amp) + ".png"
     cv2.imwrite(fileName ,imgRead)
     
-    psnr, mad, mse = fun1.calcErrorRates(None, orgImg, imgRead)
-    return psnr, mad, mse
+    mse, mad, snr, psnr = fun1.calcErrorRates(None, orgImg, imgRead)
+    return mse, mad, snr, psnr 
     
 
 
