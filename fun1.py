@@ -226,26 +226,29 @@ def readParamsFromIniFile(pathToIniFile):
     return startT_Read, startF_Read, durationT_Read, durationF_Read, amplification_Read, frame_size_Read, hop_size_Read, samplingRate_Read, minVal_Read, maxVal_Read
 
 def calcErrorRates(ptr, orgImg, readFromWavImg):
+    diff = readFromWavImg.copy() - orgImg.copy()
     pixelsAmount = orgImg.shape[0] * orgImg.shape[1]
     Log(ptr, "Wyliczanie miar błędów")
-    mse = np.sum((orgImg.copy() - readFromWavImg.copy()) ** 2) / pixelsAmount
-    if(mse == 0):  # MSE is zero means no noise is present in the signal .
-        Log(ptr, "[ERROR] wystąpił błąd przy wyliczaniu miar błędów")
-        psnr = 0
-    else:
-        max_pixel = np.max(readFromWavImg.copy())
-        psnr = 10 * np.log10(max_pixel / np.sqrt(mse))
-
-
-    mad = np.sum(abs(readFromWavImg.copy() - orgImg.copy())) / pixelsAmount
+    mad = np.sum(abs(diff)) / pixelsAmount
+    mse = np.sum(diff ** 2) / pixelsAmount
     
+    mianownik = np.sum(diff ** 2)
+    
+    snr = np.sum(orgImg.copy() ** 2) / mianownik
+    snr = 10 * np.log10(snr)
+    
+    maxPixVal = np.max(orgImg)
+    psnr = np.sum(pixelsAmount * (maxPixVal ** 2)) / mianownik
+    psnr = 10 * np.log10(psnr)
+
     psnrStr = str(round(psnr,2))
     madStr = str(round(mad,2)) 
     mseStr = str(round(mse,2))
     Log(ptr,"MSE: " + mseStr)
     Log(ptr,"MAD: " + madStr)
     Log(ptr,"PSNR: " + psnrStr + " dB")
-    return psnr, mad, mse
+    return mse, mad, snr, psnr
+
 """
 def readSavedValuesAndPrintThemToGUI(ptr):
     fileDialog = QFileDialog(ptr, filter = "*.ini")
