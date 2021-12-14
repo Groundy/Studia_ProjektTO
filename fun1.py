@@ -15,8 +15,6 @@ from PyQt5.QtWidgets import QFileDialog, QPlainTextEdit
 
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
-
-
 windowType = "nuttall"
 
 def readAudioFile(absPath):
@@ -43,46 +41,46 @@ def paintSpectogram(Y, sr, hop_length, y_axis="linear" ):
     #plt.savefig("spectogram.png", bbox_inches='tight')
     return figure
     
-def mapImgToSTFT(ptr):
+def mapImgToSTFT(ptr, startX, startY, monoImg, stft, durationX = 0, durationY = 0, amplifierDb = -10):
     Log(ptr,"Rozpoczęto mapowanie obrazu do spektrogramu")
     
     #wzmocnienie nie powinno byc wieksze niz 0
-    needToScaleImg = ptr.durationFrameTime != ptr.imgData.shape[1] and ptr.durationFrameFreq != ptr.imgData.shape[0]
+    needToScaleImg = durationX != 0 and durationY != 0
     if(needToScaleImg):
-        aboveX = (ptr.startFrameTime + ptr.durationFrameFreq) >= ptr.stftModulOrg.shape[1]
-        aboveY = (ptr.startFrameFreq + ptr.durationFrameFreq) >= ptr.stftModulOrg.shape[0]
+        aboveX = (startX + durationY) >= stft.shape[1]
+        aboveY = (startY + durationY) >= stft.shape[0]
     else:
-        aboveX = (ptr.startFrameTime + ptr.imgData.shape[1]) >= ptr.stftModulOrg.shape[1]
-        aboveY = (ptr.startFrameFreq + ptr.imgData.shape[0]) >= ptr.stftModulOrg.shape[0]
-    dimensionError = ptr.startFrameTime < 0 or ptr.startFrameFreq < 0 or aboveX or aboveY
+        aboveX = (startX + monoImg.shape[1]) >= stft.shape[1]
+        aboveY = (startY + monoImg.shape[0]) >= stft.shape[0]
+    dimensionError = startX < 0 or startY < 0 or aboveX or aboveY
     if(dimensionError):
         Log(ptr, "[ERROR] Źle wprowadzono punkt startu i wymiary obrazu do mapowania")
         return
     
-    minVal = np.min(ptr.stftModulOrg)
-    maxVal = np.max(ptr.stftModulOrg)
+    minVal = np.min(stft)
+    maxVal = np.max(stft)
     if(maxVal <= minVal):
         Log(ptr, "[ERROR] błąd skalowania jasnosci obrazu")
     valPerPix = (maxVal - minVal) / 255
     
     
-    imgCpy = ptr.imgData.copy()
-    stftCpy = ptr.stftModulOrg.copy()
+    imgCpy = monoImg.copy()
+    stftCpy = stft.copy()
     if(needToScaleImg):
-        shape = (ptr.durationFrameTime, ptr.durationFrameFreq)
-        factorX = ptr.durationFrameTime / ptr.imgData.shape[1]
-        factorY = ptr.durationFrameFreq / ptr.imgData.shape[0]
+        shape = (durationX, durationY)
+        factorX = durationX / monoImg.shape[1]
+        factorY = durationY / monoImg.shape[0]
         imgCpy = cv2.resize(imgCpy, shape, fx = factorX, fy = factorY)
         
     imgW = imgCpy.shape[1]
     imgH = imgCpy.shape[0]
     for x in range(0, imgW):
         for y in range(0, imgH):   
-            yPosSpect = y + ptr.startFrameFreq   
-            xPosSpect = x + ptr.startFrameTime   
+            yPosSpect = y + startY   
+            xPosSpect = x + startX   
             valOfLumInPic = imgCpy[imgH - y - 1][x]
             valToSet = minVal + (valPerPix * valOfLumInPic)
-            valToSet *= 10**(ptr.amplification/10)
+            valToSet *= 10**(amplifierDb/10)
             stftCpy[yPosSpect][xPosSpect] = valToSet
             
     return stftCpy
@@ -124,8 +122,9 @@ def pyPlotToCv2Img(fig):
     return graph_image
 
 def Log(ptr, text):
-    logView = ptr.findChild(QPlainTextEdit,"plainTextEdit")
-    logView.appendPlainText(text)
+    if(ptr != None):
+        logView = ptr.findChild(QPlainTextEdit,"plainTextEdit")
+        logView.appendPlainText(text)
 
 def saveFiles(ptr):
     Log(ptr,"Zapisywanie plików na dysk")
@@ -165,7 +164,6 @@ def saveFiles(ptr):
     settingsFile.setValue("maxVal", int(np.max(ptr.stftModulModified)))
     
         
-
     imgFromMappedSpect = fun1.extractImgFromSTFT(
         stftModul = ptr.stftModulModified,
         startT = ptr.startFrameTime,
@@ -201,12 +199,14 @@ def saveFiles(ptr):
     calcErrorRates(ptr,imgFromMappedSpect,imgReadFromWavFile)
 
 def extractImgFromSTFT(stftModul, startT, startF, durationT, durationF, amplification = -10):
+    maxValue = np.max(stftModul)
     f_start = startF
     f_end = durationF + startF
     t_start = startT
     t_end = durationT + startT
     img = stftModul[f_start : f_end , t_start : t_end]
-    img *= 10**(-amplification/10)  
+    img *= 10**(-amplification/10)
+    img = (img / np.max(img)) * maxValue
     img = img.astype(int)
     img = np.flipud(img)
     return img
@@ -239,12 +239,13 @@ def calcErrorRates(ptr, orgImg, readFromWavImg):
 
     mad = np.sum(abs(readFromWavImg.copy() - orgImg.copy())) / pixelsAmount
     
-    psnr = str(round(psnr,2))
-    mad = str(round(mad,2)) 
-    mse = str(round(mse,2))
-    Log(ptr,"MSE: " + mse)
-    Log(ptr,"MAD: " + mad)
-    Log(ptr,"PSNR: " + psnr + "dB")
+    psnrStr = str(round(psnr,2))
+    madStr = str(round(mad,2)) 
+    mseStr = str(round(mse,2))
+    Log(ptr,"MSE: " + mseStr)
+    Log(ptr,"MAD: " + madStr)
+    Log(ptr,"PSNR: " + psnrStr + " dB")
+    return psnr, mad, mse
 """
 def readSavedValuesAndPrintThemToGUI(ptr):
     fileDialog = QFileDialog(ptr, filter = "*.ini")

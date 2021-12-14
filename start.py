@@ -58,7 +58,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
     def addImgToTmpSpectrogram(self):
         self.amplification = self.findChild(QDoubleSpinBox ,"amplifierSpinBox").value()
-        self.stftModulModified = fun1.mapImgToSTFT(self)
+        self.stftModulModified = fun1.mapImgToSTFT(
+            ptr = self,
+            startX = self.startFrameTime,
+            startY = self.startFrameFreq,
+            monoImg = self.imgData,
+            stft = self.stftModulOrg,
+            durationX = self.durationFrameTime,
+            durationY = self.durationFrameFreq,
+            amplifierDb = self.amplification)
         figure = fun1.paintSpectogram(self.stftModulModified, self.samplingRate, self.HOP_SIZE)
         self.paintSpectogramToLabel(figure)
         
@@ -134,14 +142,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         isChecked = self.findChild(QCheckBox,"scalingChekbox").isChecked()
         spinBox1 = self.findChild(QSpinBox ,"imgDurationSpinBox_T")
         spinBox2 = self.findChild(QSpinBox ,"imgDurationSpinBox_F")
-        if(isChecked):
-            spinBox1.setEnabled(True)
-            spinBox2.setEnabled(True)            
+        spinBox1.setEnabled(isChecked)
+        spinBox2.setEnabled(isChecked)         
+        if(isChecked):      
             spinBox1.setValue(1)
             spinBox2.setValue(1)
         else:
-            spinBox1.setEnabled(False)
-            spinBox2.setEnabled(False)    
             spinBox1.setValue(self.imgData.shape[1])
             spinBox2.setValue(self.imgData.shape[0])
         self.durationTimeChanged()
