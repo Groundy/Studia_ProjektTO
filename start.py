@@ -24,7 +24,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     durationFrameFreq = 0
     miliSecsForTimeFrame = 0
     hzPerFreqFrame = 0
-    amplification = float(0)
+    amplification = float(-10)
     
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
@@ -58,15 +58,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
     def addImgToTmpSpectrogram(self):
         self.amplification = self.findChild(QDoubleSpinBox ,"amplifierSpinBox").value()
-        self.stftModulModified = fun1.mapImgToSTFT(
-            self,
-            self.startFrameTime,
-            self.startFrameFreq,
-            self.imgData,
-            self.stftModulOrg,
-            self.durationFrameTime,
-            self.durationFrameFreq,
-            self.amplification)
+        self.stftModulModified = fun1.mapImgToSTFT(self)
         figure = fun1.paintSpectogram(self.stftModulModified, self.samplingRate, self.HOP_SIZE)
         self.paintSpectogramToLabel(figure)
         
@@ -83,7 +75,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         heightLabel.setText("H = " + str(height))
         minLumLabel.setText("min. lum. = " + str(minLum))
         maxLumLabel.setText("max. lum. = " + str(maxLum))
-        nameLabel.setText(fileName)
+        tooLongFilePath = len(fileName) >= 60
+        textToSet = "..."  + fileName[-57:] if tooLongFilePath else fileName
+        nameLabel.setText(textToSet)
+
 
     def chooseAudioFileButtonPressed(self):
         fileDialog = QFileDialog(self,filter = "*.wav")
@@ -91,7 +86,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         selectedFiles = fileDialog.selectedFiles()
         if( len(selectedFiles) == 1):
             label = self.findChild(QLabel, "audioFileNameLabel")
-            label.setText(selectedFiles[0])      
+            pathToFile = selectedFiles[0]
+            pathToLong = len(pathToFile) >= 60
+            textToSet = "..."  + pathToFile[-57:] if pathToLong else pathToFile
+            label.setText(textToSet)
             self.audioData, self.fileDurationMs, self.samplingRate = fun1.readAudioFile(selectedFiles[0])
             self.fillAudioLabels()
             
