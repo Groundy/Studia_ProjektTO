@@ -57,11 +57,35 @@ def thresholdQR(QRImg):
     maxLum = np.max(QRImg)
     minLum = np.min(QRImg)
     threshold = minLum + ((maxLum - minLum) / 2)
-    for x in range(maxX):
-        for y in range(maxY):
-            aboveThreshold = imgCpy[y][x] >= threshold
+    for y in range(maxY): 
+        threshold = np.mean(imgCpy[y][:])
+        for x in range(maxX):
+            aboveThreshold = imgCpy[y][x] > threshold
             toSet = 0xff if aboveThreshold else 0
             imgCpy[y][x] = toSet
+    return imgCpy
+
+def thresholdQR(QRImg, size):
+    imgCpy = QRImg.copy()
+    maxX = QRImg.shape[1]
+    maxY = QRImg.shape[0]
+    maxLum = np.max(QRImg)
+    minLum = np.min(QRImg)
+    xBlocks = int(maxY / size)
+    yBlocks = int(maxY / size)
+    blocksMeans = np.zeros((yBlocks, xBlocks),dtype = float)
+    for x in range(xBlocks):
+        for y in range(yBlocks):
+            block = imgCpy[y*size : y*size + size,x*size : x*size + size].copy()
+            blocksMeans[y][x] = np.mean(block)
+            
+    blocksMeans = (blocksMeans / np.max(blocksMeans)) * 255
+    for x in range(xBlocks):
+        for y in range(yBlocks):
+            val = blocksMeans[y][x]
+            aboveThreshold = val > 85
+            toSet = 255 if aboveThreshold else 0
+            imgCpy[y*size : y*size + size, x*size : x*size + size] = toSet
     return imgCpy
 
 def thresholdAdv(img, bitsPerPixel):
@@ -70,13 +94,13 @@ def thresholdAdv(img, bitsPerPixel):
     maxY = img.shape[0]
     maxLum = np.max(img)
     minLum = np.min(img)
-    levels = (2 ** bitsPerPixel) - 1
-    diffPerLevel = (maxLum - minLum) / levels
-    endValuePerLevel = 255 / levels
+    levels = 2 ** bitsPerPixel
+    diffPerLevel = (maxLum - minLum) / (levels - 1)
+    endValuePerLevel = 255 / (levels - 1)
     for x in range(maxX):
         for y in range(maxY):
             pixVal = imgCpy[y][x]
-            levelNumber = np.floor(pixVal / diffPerLevel)
+            levelNumber = round(pixVal / diffPerLevel)
      
             imgCpy[y][x] = endValuePerLevel * levelNumber
     return imgCpy
@@ -124,7 +148,7 @@ def testThresholding():
     w = lenaImg.shape[1]
     h = lenaImg.shape[0]
     imgs = np.zeros((len(imgsVect),w,h),dtype = np.uint8)
-    """
+    
     for i in imgsVect:
         img = thresholdAdv(lenaImg,i)
         cv2.imwrite("./res/lena_treshold_" + str(i) + ".png",img)
@@ -137,11 +161,10 @@ def testThresholding():
                 wholeImg[y + h][N*w + x] = imgs[N][y][x]
                 wholeImg[y][N*w + x] = lenaImg[y][x]
     cv2.imwrite("./res/whole.png",wholeImg)
-    """
+    
     qrImg = cv2.imread("./testFiles/qrDestroyed.png", cv2.IMREAD_GRAYSCALE)
-    qrImg2 = thresholdQR(qrImg)
+    qrImg2 = thresholdQR(qrImg,5)
     cv2.imwrite("./res/qrRepaired.png",qrImg2)
-
 
 
 
