@@ -3,7 +3,7 @@ import numpy as np
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QCheckBox, QPushButton, QDoubleSpinBox
 import fun1
-import librosa 
+from librosa import stft, istft
 from PyQt5.QtGui import QImage,QPixmap, QColor
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
@@ -222,8 +222,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             fun1.Log(self, "[ERROR] Nie wybrano pliku dzwiękowego")
             return
         fun1.Log(self, "Wyliczanie spektrogramu oryginalnego pliku")
-        stft = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE,window=fun1.windowType)
-        self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stft)
+        stftCalc = stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE,window=fun1.windowType)
+        self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stftCalc)
         
         timeFramesLabel = self.findChild(QLabel,"totalTimeFramesLabel")
         freqFramesLabel = self.findChild(QLabel,"totalFreqFramesLabel")
@@ -235,8 +235,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         widthHightRatioLabelOrg.setText("Oryginalny stosunek W/H : "+dimRatioStr)
         
         maxFreq = (1 + self.FRAME_SIZE / 2) * self.samplingRate / self.FRAME_SIZE
-        self.hzPerFreqFrame = maxFreq / stft.shape[0]
-        self.miliSecsForTimeFrame = self.fileDurationMs / stft.shape[1]
+        self.hzPerFreqFrame = maxFreq / stftCalc.shape[0]
+        self.miliSecsForTimeFrame = self.fileDurationMs / stftCalc.shape[1]
         turnOnGui = self.stftModulOrg.shape[0] > 0 and self.stftModulOrg.shape[1] > 0 and len(self.imgData) > 0
         if(turnOnGui):
             self.turnOnGui()

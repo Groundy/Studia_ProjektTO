@@ -38,13 +38,11 @@ def paintSpectogram(Y, sr, hop_length, y_axis="linear" ):
     librosa.display.specshow(Y, sr=sr, hop_length=hop_length, x_axis="time", y_axis=y_axis)
     plt.colorbar(format="%+2.f")
     figure.tight_layout()
-    #plt.savefig("spectogram.png", bbox_inches='tight')
     return figure
     
 def mapImgToSTFT(ptr, startX, startY, monoImg, stft, durationX = 0, durationY = 0, amplifierDb = -10):
     Log(ptr,"Rozpoczęto mapowanie obrazu do spektrogramu")
     
-    #wzmocnienie nie powinno byc wieksze niz 0
     needToScaleImg = durationX != 0 and durationY != 0
     if(needToScaleImg):
         aboveX = (startX + durationY) >= stft.shape[1]
@@ -109,15 +107,9 @@ def splitCompNum(complexNumberArr):
     return modulArr, phaseArr
 
 def pyPlotToCv2Img(fig): 
-    # create a figure
-    #fig = plt.figure()
     canvas = FigureCanvas(fig)
     canvas.draw()
-
-    # convert canvas to image
     graph_image = np.array(fig.canvas.get_renderer()._renderer)
-
-    # it still is rgb, convert to opencv's default bgr
     graph_image = cv2.cvtColor(graph_image, cv2.COLOR_RGB2BGR)
     return graph_image
 
@@ -163,7 +155,7 @@ def saveFiles(ptr):
     settingsFile.setValue("minVal", int(np.min(ptr.stftModulModified)))
     settingsFile.setValue("maxVal", int(np.max(ptr.stftModulModified)))
     
-        
+    #tutaj czytamy uprzednio zapisane pliki
     imgFromMappedSpect = fun1.extractImgFromSTFT(
         stftModul = ptr.stftModulModified,
         startT = ptr.startFrameTime,
@@ -248,58 +240,3 @@ def calcErrorRates(ptr, orgImg, readFromWavImg):
     Log(ptr,"MAD: " + madStr)
     Log(ptr,"PSNR: " + psnrStr + " dB")
     return mse, mad, snr, psnr
-
-"""
-def readSavedValuesAndPrintThemToGUI(ptr):
-    fileDialog = QFileDialog(ptr, filter = "*.ini")
-    fileDialog.exec_()
-    
-    #wybieranie pliku i wyodrebnianie z niego czesci nazwy pliku wspolnej dla wszystkich innych plikow
-    absPathToIniFile = fileDialog.selectedFiles()
-    if(len(absPathToIniFile) > 1):
-        print("Wybierz tylko 1 plik.")
-        return
-    if(len(absPathToIniFile) == 0 or len(absPathToIniFile[0]) == 0):
-        print("Musisz wybrać plik do odczytu.")
-        return
-    
-    absPathToIniFile = absPathToIniFile[0]
-    PosLastSlash = absPathToIniFile.rfind("/")
-    if(PosLastSlash == -1):
-        print("Wybrano plik o nieodpowiedniej nazwie")
-        return
-    fileName = absPathToIniFile[PosLastSlash + 1:]
-    
-    PosUnderline = fileName.rfind("_")
-    if(PosUnderline == -1):
-        print("Wybrano plik o nieodpowiedniej nazwie")
-        return
-    baseFileName = fileName[:PosUnderline + 1]
-    pathToFolder = absPathToIniFile[:PosLastSlash]
-    
-    baseFileName = pathToFolder + "/" + baseFileName
-    audio_FileName = baseFileName + "audio.wav"
-    key_FileName =  baseFileName + "key.ini"
-    spectogramReadFromFile_FileName = baseFileName + "spect_readFromFile.png"
-    imgCalculated_FileName = baseFileName + "imgCalculated.png"
-    imgRead_FileName = baseFileName + "imgRead.png"
-    
-    #odczytywanie wartosci z pliku .ini    
-    settingsFile = QSettings(key_FileName, QSettings.IniFormat)
-    frame_size = settingsFile.value("frame_size", 1024, int)
-    hop_size = settingsFile.value("hop_size", 256, int)
-    #startT = settingsFile.value("startT", int)
-    #startF = settingsFile.value("startF", int)
-    #durationT = settingsFile.value("durationT", int)
-    #durationF = settingsFile.value("durationF", int)
-    #amplification = settingsFile.value("amplification", -10, int)
-    
-    audioDataRead, duration, samplingRateRead = readAudioFile(audio_FileName)
-    stftRead = librosa.stft(audioDataRead, n_fft=frame_size, hop_length=hop_size, window=windowType)
-    stftModulRead, stftPhaseRead = splitCompNum(stftRead)
-    spectogramRead = paintSpectogram(stftModulRead, samplingRateRead, hop_size)
-    spectogramRead.savefig(spectogramReadFromFile_FileName)
-    compareTwoModArrays(stftModulRead,ptr.stftModulModified,)
-    
-    return stftModulRead, spectogramRead
-"""

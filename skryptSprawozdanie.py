@@ -50,20 +50,6 @@ def doSingleCalc(posX, posY, amp, orgImg, nameToSave = ""):
     mse, mad, snr, psnr = fun1.calcErrorRates(None, orgImg, imgRead)
     return mse, mad, snr, psnr 
  
-def thresholdQR(QRImg):
-    imgCpy = QRImg.copy()
-    maxX = QRImg.shape[1]
-    maxY = QRImg.shape[0]
-    maxLum = np.max(QRImg)
-    minLum = np.min(QRImg)
-    threshold = minLum + ((maxLum - minLum) / 2)
-    for y in range(maxY): 
-        threshold = np.mean(imgCpy[y][:])
-        for x in range(maxX):
-            aboveThreshold = imgCpy[y][x] > threshold
-            toSet = 0xff if aboveThreshold else 0
-            imgCpy[y][x] = toSet
-    return imgCpy
 
 def thresholdQR(QRImg, size):
     imgCpy = QRImg.copy()
