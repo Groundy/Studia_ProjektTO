@@ -3,7 +3,7 @@ import numpy as np
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QFileDialog, QLabel, QSpinBox, QCheckBox, QPushButton, QDoubleSpinBox
 import fun1
-from librosa import stft, istft
+import librosa
 from PyQt5.QtGui import QImage,QPixmap, QColor
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("MainWindow.ui")
@@ -222,7 +222,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             fun1.Log(self, "[ERROR] Nie wybrano pliku dzwiękowego")
             return
         fun1.Log(self, "Wyliczanie spektrogramu oryginalnego pliku")
-        stftCalc = stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE,window=fun1.windowType)
+        stftCalc = librosa.stft(self.audioData, n_fft=self.FRAME_SIZE, hop_length=self.HOP_SIZE,window=fun1.windowType)
         self.stftModulOrg, self.stftPhaseOrg = fun1.splitCompNum(stftCalc)
         
         timeFramesLabel = self.findChild(QLabel,"totalTimeFramesLabel")
